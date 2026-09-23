@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IG Analytics</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#fbf7f4;--card:rgba(255,255,255,.82);--tx:#1c1a21;--mu:#6f6a78;--bd:#ece5ea;--a:#d6336c;--b:#7048e8;--c:#f59f00;--sh:0 1px 2px rgba(60,20,50,.05),0 8px 24px rgba(60,20,50,.06);--r:18px;
+--g:linear-gradient(120deg,var(--c),var(--a) 50%,var(--b))}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#100e13;--card:rgba(30,27,36,.82);--tx:#f3f0f6;--mu:#a09aa8;--bd:#2c2833;--a:#f06595;--b:#9775fa;--c:#fcc419;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35)}}
+:root[data-theme="dark"]{--bg:#100e13;--card:rgba(30,27,36,.82);--tx:#f3f0f6;--mu:#a09aa8;--bd:#2c2833;--a:#f06595;--b:#9775fa;--c:#fcc419;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;color:var(--tx);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);min-height:100vh;
+background-image:radial-gradient(60vmax 40vmax at 8% -10%,color-mix(in srgb,var(--c) 22%,transparent),transparent 60%),radial-gradient(55vmax 40vmax at 100% 0,color-mix(in srgb,var(--b) 20%,transparent),transparent 60%),radial-gradient(50vmax 40vmax at 50% 110%,color-mix(in srgb,var(--a) 14%,transparent),transparent 60%);background-attachment:fixed}
+body.drag:after{content:"Drop your JSON files";position:fixed;inset:0;z-index:9;display:grid;place-items:center;font-size:28px;font-weight:700;color:#fff;background:color-mix(in srgb,var(--a) 82%,#000);}
+main{max-width:1040px;margin:0 auto;padding:28px 18px 64px}
+header{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:26px}
+h1{margin:0;font-size:30px;letter-spacing:-.03em;font-weight:800}
+h1 span{background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--mu);font-size:13px;margin-top:2px}
+button,.btn{font:inherit;font-weight:600;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:9px 16px;border-radius:12px;cursor:pointer;box-shadow:var(--sh);transition:transform .15s,border-color .15s}
+button:hover{border-color:var(--a);transform:translateY(-1px)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+#load{background:var(--g);color:#fff;border:0}
+.hero{text-align:center;padding:56px 24px;border:2px dashed color-mix(in srgb,var(--a) 45%,var(--bd));border-radius:26px;background:var(--card);box-shadow:var(--sh);backdrop-filter:blur(10px);cursor:pointer;transition:border-color .2s,transform .2s}
+.hero:hover{border-color:var(--a);transform:translateY(-2px)}
+.hero .ic{width:68px;height:68px;margin:0 auto 18px;border-radius:20px;background:var(--g);display:grid;place-items:center;font-size:32px;color:#fff;box-shadow:0 10px 30px color-mix(in srgb,var(--a) 40%,transparent)}
+.hero h2{font-size:24px;margin:0 0 8px;letter-spacing:-.02em}
+.hero p{margin:0 auto;max-width:520px;color:var(--mu)}
+.steps{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin:28px auto 0;max-width:760px;text-align:left}
+.steps div{padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--bg) 70%,transparent);border:1px solid var(--bd);font-size:13px;color:var(--mu)}
+.steps b{display:block;color:var(--tx);margin-bottom:2px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:20px;box-shadow:var(--sh);backdrop-filter:blur(10px)}
+.stat{position:relative;overflow:hidden;padding:18px 18px 16px}
+.stat:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--g)}
+.stat b{display:block;font-size:30px;line-height:1.15;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.stat small{color:var(--mu);font-size:13px}
+.stat:nth-child(-n+2) b{background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:16px;margin:0 0 14px;letter-spacing:-.01em}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--mu);margin-bottom:10px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:4px;margin-right:6px;vertical-align:-1px}
+.chart{overflow-x:auto;padding-bottom:4px}
+.bar{display:flex;height:16px;border-radius:9px;overflow:hidden;background:var(--bd);margin:6px 0 12px}
+ul.ins{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+ul.ins li{padding:10px 14px;border-radius:12px;background:color-mix(in srgb,var(--bg) 60%,transparent);border:1px solid var(--bd)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.tabs button{padding:6px 13px;font-size:13px;border-radius:999px;box-shadow:none}
+.tabs button.on{background:var(--g);border-color:transparent;color:#fff}
+.tabs em{font-style:normal;opacity:.7;margin-left:6px;font-weight:500}
+input[type=search]{width:100%;font:inherit;padding:11px 14px;border-radius:12px;border:1px solid var(--bd);background:color-mix(in srgb,var(--bg) 70%,transparent);color:var(--tx);margin-bottom:8px}
+.rows{max-height:480px;overflow-y:auto}
+.row{display:flex;justify-content:space-between;gap:10px;padding:10px 6px;border-bottom:1px solid var(--bd);align-items:center;border-radius:8px}
+.row:hover{background:color-mix(in srgb,var(--a) 7%,transparent)}
+.row a{color:var(--tx);text-decoration:none;font-weight:600}.row a:hover{color:var(--a)}
+.row span{color:var(--mu);font-size:13px}.row .d{white-space:nowrap;font-size:12px}
+.empty{color:var(--mu);padding:18px 0;text-align:center}
+@media (max-width:520px){h1{font-size:25px}.hero{padding:40px 18px}main{padding:20px 14px 48px}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div><h1><span>IG Analytics</span></h1><div class="sub" id="meta"></div></div>
+  <div><input id="file" type="file" accept=".json" multiple hidden><button id="load">Load your JSON files</button></div>
+</header>
+<section class="hero" id="hero" tabindex="0" role="button" aria-label="Choose your Instagram JSON files">
+  <div class="ic">&#128202;</div>
+  <h2>Drop your Instagram export here</h2>
+  <p>Drag your JSON files onto the page or click to choose them. Everything is read in your browser and nothing is uploaded.</p>
+  <div class="steps">
+    <div><b>1. Request your data</b>Instagram &rarr; Accounts Center &rarr; Your information &rarr; Download your information (format: JSON).</div>
+    <div><b>2. Pick the files</b>followers_1, following, close_friends, pending_follow_requests, recent_follow_requests&hellip;</div>
+    <div><b>3. Select them together</b>Load the whole set at once so mutuals and follow-backs are calculated correctly.</div>
+  </div>
+</section>
+<div id="dash" hidden>
+<div class="grid" id="stats"></div>
+<div class="card" style="margin-bottom:16px"><h2>Insights</h2><ul class="ins" id="ins"></ul></div>
+<div class="card" style="margin-bottom:16px"><h2>Activity per month</h2>
+  <div class="legend"><span><i style="background:var(--a)"></i>New followers</span><span><i style="background:var(--b)"></i>Accounts you followed</span></div>
+  <div class="chart" id="chart"></div></div>
+<div class="card" style="margin-bottom:16px"><h2>Who you follow</h2><div class="bar" id="bar"></div><div class="legend" id="barl"></div></div>
+<div class="card"><h2>Lists</h2><div class="tabs" id="tabs"></div>
+  <input type="search" id="q" placeholder="Search username or name…"><div class="rows" id="rows"></div></div>
+</div>
+</main>
+<script>
+const EMBED=/*DATA*/null;
+let D={followers:[],following:[],close:[],pending:[],recent:[],unf:[],removed:[]};
+const $=id=>document.getElementById(id);
+const fix=s=>{try{return decodeURIComponent(escape(s||""))}catch(e){return s||""}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=n=>n.toLocaleString();
+const day=t=>t?new Date(t*1000).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"}):"";
+const mkey=t=>{const d=new Date(t*1000);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")};
+
+function parseFile(name,j){
+  name=name.toLowerCase();
+  const lv=j=>j.map(x=>{const g=re=>((x.label_values||[]).find(l=>re.test(l.label))||{}).value||"";
+    return [g(/usuario|username/i).toLowerCase(),fix(g(/^(nombre|name)$/i)),x.timestamp||0]}).filter(x=>x[0]);
+  if(name.startsWith("followers"))return["followers",j.map(x=>{const s=x.string_list_data[0]||{};return[(s.value||"").toLowerCase(),"",s.timestamp||0]}).filter(x=>x[0])];
+  if(name.startsWith("following"))return["following",(j.relationships_following||[]).map(x=>{const s=x.string_list_data[0]||{};return[(x.title||"").toLowerCase(),"",s.timestamp||0]}).filter(x=>x[0])];
+  if(name.startsWith("close_friends"))return["close",lv(j)];
+  if(name.startsWith("pending_follow"))return["pending",lv(j)];
+  if(name.startsWith("recent_follow"))return["recent",lv(j)];
+  if(name.startsWith("recently_unfollowed"))return["unf",lv(j)];
+  if(name.startsWith("removed_suggestions"))return["removed",lv(j)];
+  return null;
+}
+$("load").onclick=()=>$("file").click();
+async function loadFiles(files){
+  const got={};let n=0;
+  for(const f of files){try{const r=parseFile(f.name,JSON.parse(await f.text()));if(r){got[r[0]]=(got[r[0]]||[]).concat(r[1]);n++}}catch(err){}}
+  if(n){Object.assign(D,got);render(true)}else alert("No recognised Instagram export files found.");
+}
+$("file").onchange=e=>{loadFiles(e.target.files);e.target.value=""};
+$("hero").onclick=()=>$("file").click();
+$("hero").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("file").click()}};
+addEventListener("dragover",e=>{e.preventDefault();document.body.classList.add("drag")});
+addEventListener("dragleave",e=>{if(!e.relatedTarget)document.body.classList.remove("drag")});
+addEventListener("drop",e=>{e.preventDefault();document.body.classList.remove("drag");loadFiles(e.dataTransfer.files)});
+
+function render(loaded){
+  const has=D.followers.length||D.following.length;$("hero").hidden=!!has;$("dash").hidden=!has;if(!has){$("meta").textContent="Load your Instagram export to begin";return}
+  const F=new Map(D.followers.map(x=>[x[0],x])),G=new Map(D.following.map(x=>[x[0],x]));
+  const mutual=D.following.filter(x=>F.has(x[0])),nfb=D.following.filter(x=>!F.has(x[0])),fans=D.followers.filter(x=>!G.has(x[0]));
+  const unfStill=D.unf.filter(x=>F.has(x[0])),cfNo=D.close.filter(x=>!F.has(x[0]));
+  const ratio=D.following.length?(D.followers.length/D.following.length):0;
+  const st=[["Followers",fmt(D.followers.length)],["Following",fmt(D.following.length)],["Follower ratio",ratio.toFixed(2)],
+    ["Mutuals",fmt(mutual.length)],["Don't follow back",fmt(nfb.length)],["Fans (you don't follow)",fmt(fans.length)],
+    ["Close friends",fmt(D.close.length)],["Pending requests",fmt(D.pending.length)]];
+  $("stats").innerHTML=st.map(s=>`<div class="card stat"><b>${s[1]}</b><small>${s[0]}</small></div>`).join("");
+  $("meta").textContent=loaded?"Showing the files you loaded":"Built from your Instagram data export";
+  const pct=(a,b)=>b?Math.round(a/b*100):0, recent=D.recent.length;
+  const ins=[
+    `<b>${pct(mutual.length,D.following.length)}%</b> of the accounts you follow follow you back; <b>${fmt(nfb.length)}</b> don't.`,
+    `<b>${pct(mutual.length,D.followers.length)}%</b> of your followers are people you follow back.`,
+    ratio>=1?`You have more followers than accounts followed (ratio ${ratio.toFixed(2)}).`:`You follow more accounts than follow you (ratio ${ratio.toFixed(2)}).`,
+    D.unf.length?`You recently unfollowed <b>${fmt(D.unf.length)}</b> profiles; <b>${fmt(unfStill.length)}</b> of them still follow you.`:"",
+    cfNo.length?`<b>${fmt(cfNo.length)}</b> of your ${D.close.length} close friends don't follow you back.`:"",
+    D.pending.length?`<b>${fmt(D.pending.length)}</b> follow requests are still pending${D.pending.length?`, the oldest from ${day(Math.min(...D.pending.map(x=>x[2])))}`:""}.`:"",
+    recent?`You have <b>${fmt(recent)}</b> recent follow requests on record.`:""
+  ].filter(Boolean);
+  $("ins").innerHTML=ins.map(i=>`<li>${i}</li>`).join("");
+  // monthly chart
+  const fm={},gm={};D.followers.forEach(x=>{if(x[2]){const k=mkey(x[2]);fm[k]=(fm[k]||0)+1}});D.following.forEach(x=>{if(x[2]){const k=mkey(x[2]);gm[k]=(gm[k]||0)+1}});
+  const all=[...new Set([...Object.keys(fm),...Object.keys(gm)])].sort().slice(-18);
+  const mx=Math.max(1,...all.map(k=>Math.max(fm[k]||0,gm[k]||0))),W=Math.max(all.length*44,320),H=180;
+  let s=`<svg width="${W}" height="${H+24}" role="img" aria-label="Monthly activity">`;
+  all.forEach((k,i)=>{const x=i*44+6,a=(fm[k]||0)/mx*(H-16),b=(gm[k]||0)/mx*(H-16);
+    s+=`<rect x="${x}" y="${H-a}" width="16" height="${a}" rx="3" fill="var(--a)"><title>${k}: ${fm[k]||0} new followers</title></rect>`+
+       `<rect x="${x+18}" y="${H-b}" width="16" height="${b}" rx="3" fill="var(--b)"><title>${k}: ${gm[k]||0} followed</title></rect>`+
+       `<text x="${x+17}" y="${H+15}" text-anchor="middle" font-size="10" fill="var(--mu)">${k.slice(2)}</text>`});
+  $("chart").innerHTML=all.length?s+"</svg>":'<div class="empty">No timestamps found.</div>';
+  // breakdown bar
+  const tot=D.following.length||1;
+  $("bar").innerHTML=`<div style="width:${mutual.length/tot*100}%;background:var(--b)"></div><div style="width:${nfb.length/tot*100}%;background:var(--c)"></div>`;
+  $("barl").innerHTML=`<span><i style="background:var(--b)"></i>Follow you back (${fmt(mutual.length)})</span><span><i style="background:var(--c)"></i>Don't follow back (${fmt(nfb.length)})</span>`;
+  // lists
+  L=[["Don't follow back",nfb],["Fans",fans],["Mutuals",mutual],["Close friends",D.close],["Pending",D.pending],["Recent requests",D.recent],["Unfollowed",D.unf],["Removed suggestions",D.removed],["Followers",D.followers],["Following",D.following]];
+  if(cur>=L.length)cur=0;drawTabs();drawRows();
+}
+let L=[],cur=0;
+function drawTabs(){
+  $("tabs").innerHTML=L.map((l,i)=>`<button class="${i===cur?"on":""}" data-i="${i}">${l[0]}<em>${fmt(l[1].length)}</em></button>`).join("");
+  $("tabs").querySelectorAll("button").forEach(b=>b.onclick=()=>{cur=+b.dataset.i;drawTabs();drawRows()});
+}
+function drawRows(){
+  const q=$("q").value.trim().toLowerCase(),items=L[cur][1].filter(x=>!q||x[0].includes(q)||x[1].toLowerCase().includes(q)).slice().sort((a,b)=>b[2]-a[2]);
+  $("rows").innerHTML=items.length?items.slice(0,400).map(x=>`<div class="row"><div><a href="https://www.instagram.com/${encodeURIComponent(x[0])}" target="_blank" rel="noopener">@${esc(x[0])}</a>${x[1]?` <span>${esc(x[1])}</span>`:""}</div><span class="d">${day(x[2])}</span></div>`).join("")+(items.length>400?`<div class="empty">Showing 400 of ${fmt(items.length)} — use search to narrow.</div>`:""):'<div class="empty">Nothing here.</div>';
+}
+$("q").oninput=drawRows;
+if(EMBED)D=Object.assign(D,EMBED);
+render(false);
+</script>
+</body>
+</html>
